@@ -1,0 +1,93 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: tp_mysql
+    restart: unless-stopped
+
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+    # Volumen persistente: los datos de MySQL sobreviven aunque
+    # borremos y recreemos el contenedor.
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # Este segundo volumen monta nuestro script para que MySQL
+      # lo ejecute automáticamente al primer arranque.
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+    # Exponemos el puerto por si querés conectarte desde un cliente
+    # externo (ej. MySQL Workbench) mientras desarrollás.
+    ports:
+      - "3306:3306"
+
+    # El healthcheck: MySQL corre "mysqladmin ping" cada 5 segundos.
+    # Cuando responde OK, el contenedor pasa a estado "healthy",
+    # y recién ahí el backend (Paso 5) tiene luz verde para arrancar.
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+    networks:
+      - tp_network
+
+  backend:
+    build:
+      context: ./backend        # carpeta donde Docker busca el Dockerfile
+      dockerfile: Dockerfile
+    container_name: tp_backend
+    restart: unless-stopped
+
+    # Le pasamos las mismas variables de MySQL, así database.py
+    # (que lee os.getenv(...)) las puede usar para armar la conexión.
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_HOST: mysql        # nombre del servicio, no una IP
+
+    ports:
+      - "8000:8000"
+
+    # Esto es la pieza clave del Paso 4: el backend no arranca
+    # hasta que MySQL esté "healthy", no solo "running".
+    # Sin esto, FastAPI podría intentar conectarse mientras MySQL
+    # todavía está inicializando, y fallar.
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+    networks:
+      - tp_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: tp_frontend
+    restart: unless-stopped
+
+    ports:
+      - "3000:80"
+
+    depends_on:
+      - backend
+
+    networks:
+      - tp_network
+
+# Declaración del volumen nombrado (Docker lo gestiona internamente,
+# no es una carpeta que vos veas directamente en tu proyecto).
+volumes:
+  mysql_data:
+
+# La red bridge personalizada: todos los servicios que la compartan
+# van a poder resolverse por nombre (ej. el backend usará "mysql"
+# como host, no una IP).
+networks:
+  tp_network:
+    driver: bridge
