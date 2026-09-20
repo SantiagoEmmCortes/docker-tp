@@ -1,4 +1,4 @@
-# TP Docker — Equipo #X
+# TP Docker — Equipo #4
 
 Proyecto Web Full-Stack con Docker: MySQL + FastAPI + Frontend estático (Nginx).
 
