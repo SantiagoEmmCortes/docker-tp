@@ -1,8 +1,5 @@
-// Ojo: la URL es relativa ("/api/..."), no "http://localhost:8000/...".
-// La idea es que el navegador le pida esto a Nginx (mismo origen que
-// sirvió el HTML), y sea Nginx quien internamente lo redirija al
-// backend. Esto evita tener que lidiar con CORS entre orígenes
-// distintos desde el punto de vista del navegador.
+// URL relativa ("/api/..."), para que el navegador haga la peticion a Nginx (mismo origen que sirvió el HTML), y Nginx lo redirija al backend.
+// Evita tener que lidiar con CORS entre orígenes distintos desde el punto de vista del navegador.
 fetch("/api/usuarios/1")
   .then(res => {
     if (!res.ok) throw new Error("Error al consultar el backend");

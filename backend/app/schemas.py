@@ -6,4 +6,4 @@ class UsuarioOut(BaseModel):
     email: str
 
     class Config:
-        from_attributes = True  # permite construir esto desde un objeto SQLAlchemy
+        from_attributes = True  # Permite construir esto desde un objeto SQLAlchemy

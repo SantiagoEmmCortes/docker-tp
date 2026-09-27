@@ -8,11 +8,10 @@ from .schemas import UsuarioOut
 
 app = FastAPI(title="TP Docker - Backend")
 
-# CORS: sin esto, el navegador bloquearía las peticiones fetch()
-# que el frontend (sirviendo desde otro puerto/origen) le haga a esta API.
+# CORS: sin esto, el navegador bloquearía las peticiones fetch() que el frontend (sirviendo desde otro puerto/origen) le haga a esta API.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # para el TP alcanza con "*"; en producción se restringe
+    allow_origins=["*"],  
     allow_methods=["*"],
     allow_headers=["*"],
 )

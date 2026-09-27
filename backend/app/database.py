@@ -2,10 +2,8 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-# Estas variables NO vienen de un .env leído por Python acá —
-# vienen inyectadas por Docker Compose como variables de entorno
-# del sistema operativo del contenedor (se las pasamos en el
-# docker-compose.yml en el próximo paso).
+# Variables inyectadas por Docker Compose como variables de entorno del sistema operativo del contenedor (Pasadas en el docker-compose.yml).
+
 DB_USER = os.getenv("MYSQL_USER")
 DB_PASSWORD = os.getenv("MYSQL_PASSWORD")
 DB_HOST = os.getenv("MYSQL_HOST", "mysql")  # "mysql" = nombre del servicio en la red
