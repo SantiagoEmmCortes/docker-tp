@@ -8,4 +8,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
 
 
 INSERT INTO usuarios (nombre, email) VALUES
-    ('Santiago', 'santiagocortes@gmail.com');
+    ('Grupo 4', 'grupo4@utn.com'),
+    ('Santiago', 'santiagocortes@gmail.com'),
+    ('Ezequiel', 'ezequiel.alanis@hotmail.com'),
+    ('Alejandro', 'ulisesgomez11478951@gmail.com'),
+    ('Jorge', 'jorgeluiscabezas.f@gmail.com');
